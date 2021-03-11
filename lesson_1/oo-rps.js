@@ -33,32 +33,20 @@ const createComp = function(moves) {
   return Object.assign(player, comp);
 };
 
-const createOutcomeSubSituation = function() {
-  return {
-    rulesForHumanWin: { r: ["s"], p: ["r"], s: ["p"] },
-    outcome: null,
-    determineOutcome: function(humanMove, compMove) {
-      if (humanMove === compMove) {
-        this.outcome = "It's a draw!";
-      } else if (this.rulesForHumanWin[humanMove].includes(compMove)) {
-        this.outcome = "You win!";
-      } else {
-        this.outcome = "Computer wins!";
-      }
-    }
-  };
-};
-
 const createRPSSituation = function(humanMove, compMove) {
   return {
     humanMove: humanMove,
     compMove: compMove,
-    outcomeSubSituation: null,
-    getOutcomeSubSituation: function() {
-      this.outcomeSubSituation = createOutcomeSubSituation();
-    },
-    getOutcome: function() {
-      this.outcomeSubSituation.determineOutcome(this.humanMove, this.compMove);
+    rulesForHumWin: { r: ["s"], p: ["r"], s: ["p"] },
+    outcome: null,
+    determineOutcome: function() {
+      if (this.humanMove === this.compMove) {
+        this.outcome = "It's a draw!";
+      } else if (this.rulesForHumWin[this.humanMove].includes(this.compMove)) {
+        this.outcome = "You win!";
+      } else {
+        this.outcome = "Computer wins!";
+      }
     }
   };
 };
@@ -85,10 +73,13 @@ const rpsEngine = {
   getRPSSituation: function() {
     this.rpsSituation = createRPSSituation(this.human.move, this.comp.move);
   },
+  getRPSResult: function() {
+    this.rpsSituation.determineOutcome();
+  },
   displayResult: function() {
     console.log(`You chose: ${this.moves[this.human.move]}.`);
     console.log(`Computer chose: ${this.moves[this.comp.move]}.`);
-    console.log(`The outcome is: ${this.rpsSituation.outcomeSubSituation.outcome}`);
+    console.log(`The outcome is: ${this.rpsSituation.outcome}`);
   },
   displayGoodbyeMessage: function() {
     console.log("Thank you! Goodbye!");
@@ -101,8 +92,7 @@ const rpsEngine = {
       console.clear();
       this.getChoices();
       this.getRPSSituation();
-      this.rpsSituation.getOutcomeSubSituation();
-      this.rpsSituation.getOutcome();
+      this.getRPSResult();
       this.displayResult();
     }
     this.displayGoodbyeMessage();
