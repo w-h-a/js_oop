@@ -2,7 +2,8 @@ const readline = require("readline-sync");
 
 const createPlayer = function(moves) {
   return {
-    moves: moves
+    moves: moves,
+    move: null
   };
 };
 
@@ -15,7 +16,7 @@ const createHuman = function(moves) {
         console.log("Whoops! Try Again");
         choice = readline.question().toLowerCase();
       }
-      return choice;
+      this.move = choice;
     }
   };
   return Object.assign(player, human);
@@ -26,24 +27,13 @@ const createComp = function(moves) {
   const comp = {
     choose: function() {
       const draw = Math.floor(Math.random() * this.moves.length);
-      return this.moves[draw];
+      this.move = this.moves[draw];
     }
   };
   return Object.assign(player, comp);
 };
 
-const createChoicesSubSit = function() {
-  return {
-    humanMove: null,
-    compMove: null,
-    makeChoices: function(moves) {
-      this.humanMove = createHuman(moves).choose();
-      this.compMove = createComp(moves).choose();
-    }
-  };
-};
-
-const createOutcomeSubSit = function() {
+const createOutcomeSubSituation = function() {
   return {
     rulesForHumanWin: { r: ["s"], p: ["r"], s: ["p"] },
     outcome: null,
@@ -59,40 +49,46 @@ const createOutcomeSubSit = function() {
   };
 };
 
-const createRPSSit = function(moves) {
+const createRPSSituation = function(humanMove, compMove) {
   return {
-    choicesSubSit: createChoicesSubSit(),
-    outcomeSubSit: null,
-    getChoices: function() {
-      this.choicesSubSit.makeChoices(moves);
-    },
-    getOutcomeSubSit: function() {
-      this.outcomeSubSit = createOutcomeSubSit();
+    humanMove: humanMove,
+    compMove: compMove,
+    outcomeSubSituation: null,
+    getOutcomeSubSituation: function() {
+      this.outcomeSubSituation = createOutcomeSubSituation();
     },
     getOutcome: function() {
-      const humanMove = this.choicesSubSit.humanMove;
-      const compMove = this.choicesSubSit.compMove;
-      this.outcomeSubSit.determineOutcome(humanMove, compMove);
+      this.outcomeSubSituation.determineOutcome(this.humanMove, this.compMove);
     }
   };
 };
 
 const rpsEngine = {
   moves: { r: "rock", p: "paper", s: "scissors" },
-  rpsSit: null,
+  human: null,
+  comp: null,
+  rpsSituation: null,
   displayWelcomeMessage: function() {
     console.log("Welcome to Rock, Paper, Scissors!");
+  },
+  getPlayers: function() {
+    this.human = createHuman(Object.keys(this.moves));
+    this.comp = createComp(Object.keys(this.moves));
   },
   readyToPlay: function() {
     return readline.question("Enter 'y' when you are ready to play; otherwise enter any key or press enter to exit.\n").toLowerCase() === "y";
   },
-  getRPSSit: function() {
-    this.rpsSit = createRPSSit(Object.keys(this.moves));
+  getChoices: function() {
+    this.human.choose();
+    this.comp.choose();
+  },
+  getRPSSituation: function() {
+    this.rpsSituation = createRPSSituation(this.human.move, this.comp.move);
   },
   displayResult: function() {
-    console.log(`You chose: ${this.moves[this.rpsSit.choicesSubSit.humanMove]}.`);
-    console.log(`Computer chose: ${this.moves[this.rpsSit.choicesSubSit.compMove]}.`);
-    console.log(`The outcome is: ${this.rpsSit.outcomeSubSit.outcome}`);
+    console.log(`You chose: ${this.moves[this.human.move]}.`);
+    console.log(`Computer chose: ${this.moves[this.comp.move]}.`);
+    console.log(`The outcome is: ${this.rpsSituation.outcomeSubSituation.outcome}`);
   },
   displayGoodbyeMessage: function() {
     console.log("Thank you! Goodbye!");
@@ -100,12 +96,13 @@ const rpsEngine = {
   play: function() {
     console.clear();
     this.displayWelcomeMessage();
+    this.getPlayers();
     while (this.readyToPlay()) {
       console.clear();
-      this.getRPSSit();
-      this.rpsSit.getChoices();
-      this.rpsSit.getOutcomeSubSit();
-      this.rpsSit.getOutcome();
+      this.getChoices();
+      this.getRPSSituation();
+      this.rpsSituation.getOutcomeSubSituation();
+      this.rpsSituation.getOutcome();
       this.displayResult();
     }
     this.displayGoodbyeMessage();
