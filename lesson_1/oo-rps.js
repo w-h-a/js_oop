@@ -56,9 +56,8 @@ const rpsEngine = {
   human: null,
   comp: null,
   rpsSituation: null,
-  displayWelcomeMessage: function() {
-    console.log("Welcome to Rock, Paper, Scissors!");
-  },
+  welcomeMessage: "Welcome to Rock, Paper, Scissors!",
+  goodbyeMessage: "Thank you! Goodbye!",
   getPlayers: function() {
     this.human = createHuman(Object.keys(this.moves));
     this.comp = createComp(Object.keys(this.moves));
@@ -81,12 +80,9 @@ const rpsEngine = {
     console.log(`Computer chose: ${this.moves[this.comp.move]}.`);
     console.log(`The outcome is: ${this.rpsSituation.outcome}`);
   },
-  displayGoodbyeMessage: function() {
-    console.log("Thank you! Goodbye!");
-  },
   play: function() {
     console.clear();
-    this.displayWelcomeMessage();
+    console.log(this.welcomeMessage);
     this.getPlayers();
     while (this.readyToPlay()) {
       console.clear();
@@ -95,7 +91,7 @@ const rpsEngine = {
       this.getRPSResult();
       this.displayResult();
     }
-    this.displayGoodbyeMessage();
+    console.log(this.goodbyeMessage);
   }
 };
 
