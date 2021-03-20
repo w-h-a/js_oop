@@ -4,7 +4,7 @@ let sq1, sq2, sq3, sq4, sq5, sq6, sq7, sq8, sq9;
 
 let winLines;
 
-let board;
+let boardState;
 
 const tttHub = {
   displayWelcome: function() {
@@ -121,7 +121,7 @@ const tttHub = {
     });
     return this;
   },
-  initBoard: function() {
+  initBoardState: function() {
     this.first = sq1;
     this.second = sq2;
     this.third = sq3;
@@ -144,18 +144,18 @@ tttEngine.play = function() {
   while (this.readyToPlay()) {
     this.initializeSquares();
     winLines = Object.create(tttHub).initLines();
-    board = Object.create(tttHub).initBoard();
-    while (!this.isWinner.call(winLines) && !this.isBoardFull.call(board)) {
-      this.displayBoard.call(board);
+    boardState = Object.create(tttHub).initBoardState();
+    while (!this.isWinner.call(winLines) && !this.isBoardFull.call(boardState)) {
+      this.displayBoard.call(boardState);
       if (this.currentPlayer === "human") {
-        this.getHumanMove.call(board);
+        this.getHumanMove.call(boardState);
         this.currentPlayer = "computer";
       } else {
-        this.getCompMove.call(board);
+        this.getCompMove.call(boardState);
         this.currentPlayer = "human";
       }
     }
-    this.displayBoard.call(board);
+    this.displayBoard.call(boardState);
     this.displayResults.call(winLines);
   }
   this.displayGoodbye();
