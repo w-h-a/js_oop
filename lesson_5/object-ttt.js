@@ -8,6 +8,7 @@ let board;
 
 const tttHub = {
   displayWelcome: function() {
+    console.clear();
     console.log("Welcome to Tic Tac Toe!");
   },
   readyToPlay: function() {
@@ -25,6 +26,7 @@ const tttHub = {
     sq9 = { state: ' ' };
   },
   displayBoard: function() {
+    console.clear();
     console.log("You are 'X'. Computer is 'O'.");
     console.log('');
     console.log('     |     |');
@@ -138,14 +140,12 @@ const tttEngine = Object.create(tttHub);
 tttEngine.currentPlayer = "human";
 
 tttEngine.play = function() {
-  console.clear();
   this.displayWelcome();
   while (this.readyToPlay()) {
     this.initializeSquares();
     winLines = Object.create(tttHub).initLines();
     board = Object.create(tttHub).initBoard();
     while (!this.isWinner.call(winLines) && !this.isBoardFull.call(board)) {
-      console.clear();
       this.displayBoard.call(board);
       if (this.currentPlayer === "human") {
         this.getHumanMove.call(board);
@@ -155,7 +155,6 @@ tttEngine.play = function() {
         this.currentPlayer = "human";
       }
     }
-    console.clear();
     this.displayBoard.call(board);
     this.displayResults.call(winLines);
   }
