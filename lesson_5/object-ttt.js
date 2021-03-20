@@ -4,7 +4,7 @@ let sq1, sq2, sq3, sq4, sq5, sq6, sq7, sq8, sq9;
 
 let winLines;
 
-let boardState;
+let board;
 
 const tttHub = {
   displayWelcome: function() {
@@ -24,23 +24,6 @@ const tttHub = {
     sq7 = { state: ' ' };
     sq8 = { state: ' ' };
     sq9 = { state: ' ' };
-  },
-  displayBoard: function() {
-    console.clear();
-    console.log("You are 'X'. Computer is 'O'.");
-    console.log('');
-    console.log('     |     |');
-    console.log(`  ${this.first.state}  |  ${this.second.state}  |  ${this.third.state}`);
-    console.log('     |     |');
-    console.log('-----+-----+-----');
-    console.log('     |     |');
-    console.log(`  ${this.fourth.state}  |  ${this.fifth.state}  |  ${this.sixth.state}`);
-    console.log('     |     |');
-    console.log('-----+-----+-----');
-    console.log('     |     |');
-    console.log(`  ${this.seventh.state}  |  ${this.eighth.state}  |  ${this.ninth.state}`);
-    console.log('     |     |');
-    console.log('');
   },
   joinWith: function(arr, delim = ', ', conn = 'or') {
     if (arr.length < 2) return arr.join('');
@@ -79,11 +62,6 @@ const tttHub = {
     let compChoice = options[draw];
     this[compChoice].state = 'O';
   },
-  isBoardFull: function() {
-    return Object.keys(this).filter(function(key) {
-      return this[key].state === ' ';
-    }, this).length === 0;
-  },
   isWinner: function() {
     const possibilities = Object.keys(this);
     for (let idx = 0; idx < possibilities.length; idx += 1) {
@@ -121,7 +99,7 @@ const tttHub = {
     });
     return this;
   },
-  initBoardState: function() {
+  initBoard: function() {
     this.first = sq1;
     this.second = sq2;
     this.third = sq3;
@@ -131,6 +109,38 @@ const tttHub = {
     this.seventh = sq7;
     this.eighth = sq8;
     this.ninth = sq9;
+    Object.defineProperty(this, "displayMyself", {
+      value: function() {
+        console.clear();
+        console.log("You are 'X'. Computer is 'O'.");
+        console.log('');
+        console.log('     |     |');
+        console.log(`  ${this.first.state}  |  ${this.second.state}  |  ${this.third.state}`);
+        console.log('     |     |');
+        console.log('-----+-----+-----');
+        console.log('     |     |');
+        console.log(`  ${this.fourth.state}  |  ${this.fifth.state}  |  ${this.sixth.state}`);
+        console.log('     |     |');
+        console.log('-----+-----+-----');
+        console.log('     |     |');
+        console.log(`  ${this.seventh.state}  |  ${this.eighth.state}  |  ${this.ninth.state}`);
+        console.log('     |     |');
+        console.log('');
+      },
+      writable: true,
+      configurable: true,
+      enumerable: false
+    });
+    Object.defineProperty(this, "amIFull", {
+      value: function() {
+        return Object.keys(this).filter(function(key) {
+          return this[key].state === ' ';
+        }, this).length === 0;
+      },
+      writable: true,
+      configurable: true,
+      enumerable: false
+    });
     return this;
   }
 };
@@ -144,18 +154,18 @@ tttEngine.play = function() {
   while (this.readyToPlay()) {
     this.initializeSquares();
     winLines = Object.create(tttHub).initLines();
-    boardState = Object.create(tttHub).initBoardState();
-    while (!this.isWinner.call(winLines) && !this.isBoardFull.call(boardState)) {
-      this.displayBoard.call(boardState);
+    board = Object.create(tttHub).initBoard();
+    while (!this.isWinner.call(winLines) && !board.amIFull()) {
+      board.displayMyself();
       if (this.currentPlayer === "human") {
-        this.getHumanMove.call(boardState);
+        this.getHumanMove.call(board);
         this.currentPlayer = "computer";
       } else {
-        this.getCompMove.call(boardState);
+        this.getCompMove.call(board);
         this.currentPlayer = "human";
       }
     }
-    this.displayBoard.call(boardState);
+    board.displayMyself();
     this.displayResults.call(winLines);
   }
   this.displayGoodbye();
