@@ -7,6 +7,7 @@ const readline = require("readline-sync");
 let participants;
 let deck;
 let humanName;
+let wish;
 const dealerLimit = 17;
 const initialBucks = 5;
 const enoughBucks = 10;
@@ -16,6 +17,7 @@ const twentyOneHub = {
   displayWelcome: function() {
     console.clear();
     humanName = readline.question("Please enter your name.\n");
+    wish = readline.question("What's your one wish that money can buy?\n");
     console.log(`Welcome to Twenty-One, ${humanName}!`);
   },
   readyToPlay: function() {
@@ -26,7 +28,7 @@ const twentyOneHub = {
   },
   displayGoodbye: function() {
     const value = this.money - initialBucks;
-    if (value > 0) console.log(`You won $${value}! Treat yourself to something nice, ${humanName}!`);
+    if (value > 0) console.log(`You won $${value}! You're one step closer to getting that ${wish}!`);
     if (value < 0) console.log(`You lost $${-value}. Have a drink. The first one is on the house.`);
     if (value === 0) console.log(`${humanName}, you broke even. Better luck next time!`);
     console.log(`Thank you, ${humanName}! Goodbye!`);
