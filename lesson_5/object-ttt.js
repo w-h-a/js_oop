@@ -2,10 +2,6 @@ const readline = require('readline-sync');
 
 let sq1, sq2, sq3, sq4, sq5, sq6, sq7, sq8, sq9;
 
-let winLines;
-
-let board;
-
 const winLinesHub = {
   doIHaveAWin: function() {
     const possibilities = Object.keys(this);
@@ -148,8 +144,8 @@ tttEngine.play = function() {
   this.displayWelcome();
   while (this.readyToPlay()) {
     this.initializeSquares();
-    winLines = Object.create(winLinesHub).init();
-    board = Object.create(boardHub).init();
+    let winLines = Object.create(winLinesHub).init();
+    let board = Object.create(boardHub).init();
     let currentPlayer = "human";
     while (!winLines.doIHaveAWin() && !board.amIFull()) {
       board.displayMyself();
