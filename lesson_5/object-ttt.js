@@ -2,6 +2,59 @@ const readline = require('readline-sync');
 
 let sq1, sq2, sq3, sq4, sq5, sq6, sq7, sq8, sq9;
 
+const tttHub = {
+  displayWelcome: function() {
+    console.clear();
+    console.log("Welcome to Tic Tac Toe!");
+  },
+  readyToPlay: function() {
+    return readline.question("Enter 'y' when you are ready to play; otherwise enter any key or press enter to exit.\n").toLowerCase() === "y";
+  },
+  joinWith: function(arr, delim = ', ', conn = 'or') {
+    if (arr.length < 2) return arr.join('');
+    if (arr.length === 2) return `${arr[0]} ${conn} ${arr[1]}`;
+    let initialStr = arr.slice(0, arr.length - 1).join(delim);
+    return `${initialStr}${delim}${conn} ${arr[arr.length - 1]}`;
+  },
+  getHumanMove: function() {
+    const stringToDig = {
+      first: '1', second: '2', third: '3', fourth: '4', fifth: '5',
+      sixth: '6', seventh: '7', eighth: '8', ninth: '9'
+    };
+    const digToString = {
+      1: 'first', 2: 'second', 3: 'third', 4: 'fourth', 5: 'fifth',
+      6: 'sixth', 7: 'seventh', 8: 'eighth', 9: 'ninth'
+    };
+    const options = Object.keys(this).filter(function(key) {
+      return this[key].state === ' ';
+    }, this);
+    const mapped = options.map(ele => stringToDig[ele]);
+    let humanChoice = readline.question(`Choose a square: ${tttHub.joinWith(mapped)}:\n`);
+    while (!mapped.includes(humanChoice)) {
+      console.log("Whoops!");
+      humanChoice = readline.question();
+    }
+    this[digToString[humanChoice]].state = 'X';
+  },
+  getRandomIdxFromInterval: function(min, max) {
+    return Math.floor((Math.random() * (max - min + 1)) + min);
+  },
+  getCompMove: function() {
+    const options = Object.keys(this).filter(function(key) {
+      return this[key].state === ' ';
+    }, this);
+    let draw = tttHub.getRandomIdxFromInterval(0, options.length - 1);
+    let compChoice = options[draw];
+    this[compChoice].state = 'O';
+  },
+  displayResults: function() {
+    console.log(`The result is...: ${this.winner}`);
+  },
+  displayGoodbye: function() {
+    console.log("Thank you! Goodbye!");
+  }
+};
+
 const winLinesHub = {
   doIHaveAWin: function() {
     const possibilities = Object.keys(this);
@@ -70,59 +123,6 @@ const boardHub = {
     this.eighth = sq8;
     this.ninth = sq9;
     return this;
-  }
-};
-
-const tttHub = {
-  displayWelcome: function() {
-    console.clear();
-    console.log("Welcome to Tic Tac Toe!");
-  },
-  readyToPlay: function() {
-    return readline.question("Enter 'y' when you are ready to play; otherwise enter any key or press enter to exit.\n").toLowerCase() === "y";
-  },
-  joinWith: function(arr, delim = ', ', conn = 'or') {
-    if (arr.length < 2) return arr.join('');
-    if (arr.length === 2) return `${arr[0]} ${conn} ${arr[1]}`;
-    let initialStr = arr.slice(0, arr.length - 1).join(delim);
-    return `${initialStr}${delim}${conn} ${arr[arr.length - 1]}`;
-  },
-  getHumanMove: function() {
-    const stringToDig = {
-      first: '1', second: '2', third: '3', fourth: '4', fifth: '5',
-      sixth: '6', seventh: '7', eighth: '8', ninth: '9'
-    };
-    const digToString = {
-      1: 'first', 2: 'second', 3: 'third', 4: 'fourth', 5: 'fifth',
-      6: 'sixth', 7: 'seventh', 8: 'eighth', 9: 'ninth'
-    };
-    const options = Object.keys(this).filter(function(key) {
-      return this[key].state === ' ';
-    }, this);
-    const mapped = options.map(ele => stringToDig[ele]);
-    let humanChoice = readline.question(`Choose a square: ${tttHub.joinWith(mapped)}:\n`);
-    while (!mapped.includes(humanChoice)) {
-      console.log("Whoops!");
-      humanChoice = readline.question();
-    }
-    this[digToString[humanChoice]].state = 'X';
-  },
-  getRandomIdxFromInterval: function(min, max) {
-    return Math.floor((Math.random() * (max - min + 1)) + min);
-  },
-  getCompMove: function() {
-    const options = Object.keys(this).filter(function(key) {
-      return this[key].state === ' ';
-    }, this);
-    let draw = tttHub.getRandomIdxFromInterval(0, options.length - 1);
-    let compChoice = options[draw];
-    this[compChoice].state = 'O';
-  },
-  displayResults: function() {
-    console.log(`The result is...: ${this.winner}`);
-  },
-  displayGoodbye: function() {
-    console.log("Thank you! Goodbye!");
   }
 };
 
