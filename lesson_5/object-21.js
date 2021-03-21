@@ -1,21 +1,22 @@
+/* eslint-disable max-lines-per-function */
+/* eslint-disable max-statements */
+/* eslint-disable max-len */
+
 const readline = require("readline-sync");
 
 let participants;
-
 let deck;
-
+let humanName;
 const dealerLimit = 17;
-
-const initalBucks = 5;
-
+const initialBucks = 5;
 const enoughBucks = 10;
-
 const notEnoughBucks = 0;
 
 const twentyOneHub = {
   displayWelcome: function() {
     console.clear();
-    console.log("Welcome to Twenty-One!");
+    humanName = readline.question("Please enter your name.\n");
+    console.log(`Welcome to Twenty-One, ${humanName}!`);
   },
   readyToPlay: function() {
     return readline.question("Enter 'y' when you are ready to play; otherwise enter any key or press enter to exit.\n").toLowerCase() === "y";
@@ -24,12 +25,16 @@ const twentyOneHub = {
     return readline.question("When you are ready, enter any key or hit enter to continue.\n");
   },
   displayGoodbye: function() {
-    console.log("Thank you! Goodbye!");
+    const value = this.money - initialBucks;
+    if (value > 0) console.log(`You won $${value}! Treat yourself to something nice, ${humanName}!`);
+    if (value < 0) console.log(`You lost $${-value}. Have a drink. The first one is on the house.`);
+    if (value === 0) console.log(`${humanName}, you broke even. Better luck next time!`);
+    console.log(`Thank you, ${humanName}! Goodbye!`);
   },
   shuffle: function() {
-    for (let idx = deck.cards.length - 1; idx > 0; idx -= 1) {
+    for (let idx = this.cards.length - 1; idx > 0; idx -= 1) {
       let jdx = Math.floor(Math.random() * (idx + 1));
-      [deck.cards[idx], deck.cards[jdx]] = [deck.cards[jdx], deck.cards[idx]];
+      [this.cards[idx], this.cards[jdx]] = [this.cards[jdx], this.cards[idx]];
     }
   },
   deal: function(toWhom) {
@@ -49,9 +54,15 @@ const twentyOneHub = {
   getNoBustsOutcome: function() {
     const playerTotal = participants.getTotal("player");
     const dealerTotal = participants.getTotal("dealer");
-    if (playerTotal === dealerTotal) this.outcome = "draw";
-    if (playerTotal > dealerTotal) this.outcome = "player";
-    if (playerTotal < dealerTotal) this.outcome = "dealer";
+    if (playerTotal === dealerTotal) {
+      this.outcome = "draw";
+    } else if (playerTotal > dealerTotal) {
+      this.outcome = "player";
+      participants.money += 1;
+    } else {
+      this.outcome = "dealer";
+      participants.money -= 1;
+    }
   },
   printPartialGameSituation: function() {
     console.clear();
@@ -63,6 +74,7 @@ const twentyOneHub = {
       console.log(`You have: ${ele}`);
     });
     console.log(`Your total is ${this.getTotal("player")}`);
+    console.log(`You have $${this.money}`);
     console.log('==============');
   },
   printCompleteGameSituation: function() {
@@ -77,6 +89,7 @@ const twentyOneHub = {
       console.log(`You have: ${ele}`);
     });
     console.log(`Your total is ${this.getTotal("player")}`);
+    console.log(`You have $${this.money}`);
     console.log('==============');
   },
   printBustedOutcome: function(who) {
@@ -91,12 +104,6 @@ const twentyOneHub = {
     if (this.outcome === "draw") console.log("The game is a draw.");
     if (this.outcome === "player") console.log("You win!");
     if (this.outcome === "dealer") console.log("Dealer wins");
-  },
-  printNoMoneyOutcome: function() {
-
-  },
-  printEnoughMoneyOutcome: function() {
-
   }
 };
 
@@ -104,7 +111,7 @@ const participantsHub = {
   init: function() {
     this.playerCards = null;
     this.dealerCards = null;
-    this.money = 5;
+    this.money = initialBucks;
     return this;
   },
   getTotal: function(who) {
@@ -148,7 +155,7 @@ const participantsHub = {
     while (answer !== 'stay' && answer !== 's' && this.getTotal('player') < 21) {
       answer = readline.question("hit or stay?\n").toLowerCase();
       while (!['hit', 'stay', 'h', 's'].includes(answer)) {
-        console.log("You may only and exclusively choose either (h)it or (s)tay.");
+        console.log("You may only choose either (h)it or (s)tay exclusively.");
         answer = readline.question().toLowerCase();
       }
       if (answer === 'hit' || answer === 'h') twentyOneHub.deal.call(participants, "player");
@@ -202,25 +209,27 @@ twentyOneEngine.initializeHands = function() {
 
 twentyOneEngine.initializeDeck = function() {
   deck = Object.create(deckHub).init();
-  this.shuffle();
+  this.shuffle.call(deck);
   this.doInitialDeal.call(participants);
 };
 
 twentyOneEngine.play = function() {
   this.displayWelcome();
   this.initializeParticipants();
-  while (this.readyToPlay()) {
+  while (participants.money > notEnoughBucks && participants.money < enoughBucks && this.readyToPlay()) {
     this.initializeHands.call(participants);
     this.initializeDeck();
     this.printPartialGameSituation.call(participants);
     this.readyToContinue();
     participants.getPlayerTurn();
     if (participants.busts("player")) {
+      participants.money -= 1;
       this.printBustedOutcome("player");
       continue;
     }
     participants.getDealerTurn();
     if (participants.busts("dealer")) {
+      participants.money += 1;
       this.printBustedOutcome("dealer");
       continue;
     }
@@ -228,7 +237,7 @@ twentyOneEngine.play = function() {
     this.printCompleteGameSituation.call(participants);
     this.printNoBustsOutcome();
   }
-  this.displayGoodbye();
+  this.displayGoodbye.call(participants);
 };
 
 twentyOneEngine.play();
