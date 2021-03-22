@@ -16,8 +16,8 @@ const notEnoughBucks = 0;
 const twentyOneHub = {
   displayWelcome: function() {
     console.clear();
-    humanName = readline.question("Please enter your name.\n");
-    wish = readline.question("What's your one wish that money can buy?\n");
+    humanName = readline.question("Please enter your name:\n");
+    wish = readline.question("Name one thing you'd like that money can buy:\n");
     console.log(`Welcome to Twenty-One, ${humanName}!`);
   },
   readyToPlay: function() {
