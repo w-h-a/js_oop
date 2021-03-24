@@ -1,3 +1,5 @@
+// completed OLOO approach:
+
 const circularQ = Object.create(Array.prototype);
 
 circularQ.init = function(max) {
@@ -15,6 +17,23 @@ circularQ.enq = function(obj) {
   }
   this.push(obj);
 };
+
+// beginnings of "constructor" approach:
+
+const CircularQConstructor = function(max) {
+  this.max = max;
+};
+
+Object.setPrototypeOf(CircularQConstructor.prototype, Array.prototype);
+
+// beginnings of "classes" approach:
+
+class CircularArray extends Array {
+  constructor(max) {
+    super();
+    this.max = max;
+  }
+}
 
 
 
